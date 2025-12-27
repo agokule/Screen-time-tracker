@@ -4,13 +4,15 @@ from datetime import datetime
 from constants import DATE_FMT_SQL, TABLE_NAME, APP_EXE_COL, APP_NAME_COL, MAX_IDLE_TIME
 import sqlite3
 
+def flush_database(cursor: sqlite3.Cursor):
+    cursor.connection.commit()
+
 
 def add_program(cursor: sqlite3.Cursor, name: str, exe: str):
     cursor.execute(f"""
 INSERT INTO {TABLE_NAME} ({APP_NAME_COL}, {APP_EXE_COL}, {datetime.now().strftime(DATE_FMT_SQL)})
 VALUES (?,?,?)
 """, (name, exe, 1))
-    cursor.connection.commit()
     return cursor.lastrowid
 
 
@@ -31,7 +33,6 @@ UPDATE {TABLE_NAME}
 SET {column} = {column} + 1
 WHERE ({APP_NAME_COL} = ?) AND ({APP_EXE_COL} = ?)
 """, (name, exe))
-    cursor.connection.commit()
 
 
 def write_data(cursor: sqlite3.Cursor, proc_name: str | None, app_name: str | None):
